@@ -22,7 +22,7 @@ for notebook in `oc get notebooks.kubeflow.org --no-headers | awk '{ print $1 }'
 	NOW=`date +%s`
 	DELTA=$((NOW - LAST_ACTIVITY))
 	if [[ $DELTA -ge $THRESHOLD ]]; then
-		echo "$notebook arond for more than ${THRESHOLD}, stopping"
+		echo "$notebook around for more than ${THRESHOLD}, stopping"
 		if [[ "$1" == "dry-run" ]]; then
 			echo "This is a dry-run, not stopping $notebook"
 		else
