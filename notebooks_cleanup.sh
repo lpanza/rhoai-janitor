@@ -14,6 +14,10 @@ THRESHOLD=300
 
 for notebook in `oc get notebooks.kubeflow.org --no-headers | awk '{ print $1 }'`; do
 	echo "[`date -u "+%F %T UTC"`] Checking notebook $notebook"
+	if [[ `oc get notebooks.kubeflow.org $notebook -o jsonpath='{.metadata.annotations.kubeflow-resource-stopped}'` ]]; then
+		echo "$notebook already stopped"
+		continue
+	fi
 	LAST_ACTIVITY=`date -d $(oc get notebooks.kubeflow.org $notebook -o jsonpath='{.metadata.annotations.notebooks\.kubeflow\.org/last-activity}') +%s`
 	NOW=`date +%s`
 	DELTA=$((NOW - LAST_ACTIVITY))
@@ -25,7 +29,7 @@ for notebook in `oc get notebooks.kubeflow.org --no-headers | awk '{ print $1 }'
 			oc annotate notebooks.kubeflow.org $notebook kubeflow-resource-stopped="true"
 		fi
 	else
-		echo "All good, $notebook running for $DELTA seconds."
+		echo "$notebook running for $DELTA seconds, the threshold is $THRESHOLD."
 	fi
 	echo
 done
